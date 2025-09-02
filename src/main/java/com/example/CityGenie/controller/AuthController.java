@@ -1,28 +1,41 @@
 package com.example.CityGenie.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import java.util.Optional;
+
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.CityGenie.entity.User;
-import com.example.CityGenie.service.AuthService;
+import com.example.CityGenie.repository.UserRepository;
 
 @RestController
-@RequestMapping("/")
+@RequestMapping("/api")
 public class AuthController {
 
-    @Autowired
-    private AuthService authService;
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
+
+    public AuthController(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+        this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
+    }
 
     @PostMapping("/signup")
     public String signup(@RequestBody User user) {
-        return authService.signup(user);
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        userRepository.save(user);
+        return "Signup successful!";
     }
 
-    @PostMapping("/login")
     public String login(@RequestBody User user) {
-        return authService.login(user.getEmail(), user.getPassword());
+        Optional<User> existingUser = userRepository.findByEmail(user.getEmail());
+        if (existingUser.isPresent() && passwordEncoder.matches(user.getPassword(), existingUser.get().getPassword())) {
+            return "Login successful!";
+        } else {
+            return "Invalid credentials!";
+        }
     }
 }

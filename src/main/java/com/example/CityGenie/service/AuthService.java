@@ -10,11 +10,11 @@ import com.example.CityGenie.config.JwtUtil;
 import com.example.CityGenie.entity.User;
 import com.example.CityGenie.repository.UserRepository;
 
-@Service  
+@Service
 public class AuthService {
 
     @Autowired
-    private UserRepository userRepo ;
+    private UserRepository userRepo;
 
     @Autowired
     private BCryptPasswordEncoder passwordEncoder;
@@ -24,7 +24,7 @@ public class AuthService {
 
     // signup
     public String signup(User user) {
-        if (userRepo .findByEmailId(user.getEmail()).isPresent()) {
+        if (userRepo.findByEmail(user.getEmail()).isPresent()) {
             return "Email already exists";
         }
         user.setPassword(passwordEncoder.encode(user.getPassword()));
@@ -34,10 +34,14 @@ public class AuthService {
 
     // login
     public String login(String email, String password) {
-        Optional<User> optionalUser = userRepo .findByEmailId(email);
-        if(optionalUser.isEmpty()) return "Invalid credentials";
+        Optional<User> optionalUser = userRepo.findByEmail(email);
+        if (optionalUser.isEmpty()) {
+            return "Invalid credentials";
+        }
         User user = optionalUser.get();
-        if(!passwordEncoder.matches(password, user.getPassword())) return "Invalid credentials";
+        if (!passwordEncoder.matches(password, user.getPassword())) {
+            return "Invalid credentials";
+        }
         return jwtUtil.generateToken(email);
     }
 }
