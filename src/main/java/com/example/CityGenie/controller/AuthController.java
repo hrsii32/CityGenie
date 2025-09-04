@@ -1,41 +1,33 @@
 package com.example.CityGenie.controller;
 
-import java.util.Optional;
+import java.util.Map;
 
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.CityGenie.entity.User;
-import com.example.CityGenie.repository.UserRepository;
+import com.example.CityGenie.service.AuthService;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/auth")
 public class AuthController {
 
-    private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
-
-    public AuthController(UserRepository userRepository, PasswordEncoder passwordEncoder) {
-        this.userRepository = userRepository;
-        this.passwordEncoder = passwordEncoder;
-    }
+    @Autowired
+    private AuthService authService;
 
     @PostMapping("/signup")
-    public String signup(@RequestBody User user) {
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        userRepository.save(user);
-        return "Signup successful!";
+    public ResponseEntity<String> signup(@RequestBody User user) {
+        // Directly return the ResponseEntity from service
+        return authService.signup(user);
     }
 
-    public String login(@RequestBody User user) {
-        Optional<User> existingUser = userRepository.findByEmail(user.getEmail());
-        if (existingUser.isPresent() && passwordEncoder.matches(user.getPassword(), existingUser.get().getPassword())) {
-            return "Login successful!";
-        } else {
-            return "Invalid credentials!";
-        }
+    @PostMapping("/login")
+    public ResponseEntity<String> login(@RequestBody Map<String, String> request) {
+        // Directly return the ResponseEntity from service
+        return authService.login(request.get("email"), request.get("password"));
     }
 }

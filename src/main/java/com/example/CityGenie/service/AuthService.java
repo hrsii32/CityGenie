@@ -3,10 +3,13 @@ package com.example.CityGenie.service;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.example.CityGenie.config.JwtUtil;
+import com.example.CityGenie.entity.Role;
 import com.example.CityGenie.entity.User;
 import com.example.CityGenie.repository.UserRepository;
 
@@ -17,31 +20,50 @@ public class AuthService {
     private UserRepository userRepo;
 
     @Autowired
-    private BCryptPasswordEncoder passwordEncoder;
+    private PasswordEncoder passwordEncoder;
 
     @Autowired
     private JwtUtil jwtUtil;
 
-    // signup
-    public String signup(User user) {
+    // Signup
+    public ResponseEntity<String> signup(User user) {
         if (userRepo.findByEmail(user.getEmail()).isPresent()) {
-            return "Email already exists";
+            return ResponseEntity
+                    .status(HttpStatus.CONFLICT)
+                    .body("Email already exists. Please login instead.");
         }
+
         user.setPassword(passwordEncoder.encode(user.getPassword()));
+
+        // Default role: STUDENT if not provided
+        if (user.getRole() == null) {
+            user.setRole(Role.STUDENT);
+        }
+
         userRepo.save(user);
-        return "User registered successfully";
+        return ResponseEntity.ok("User registered successfully with role: " + user.getRole());
     }
 
-    // login
-    public String login(String email, String password) {
+    // Login
+    public ResponseEntity<String> login(String email, String password) {
         Optional<User> optionalUser = userRepo.findByEmail(email);
         if (optionalUser.isEmpty()) {
-            return "Invalid credentials";
+            return ResponseEntity
+                    .status(HttpStatus.UNAUTHORIZED)
+                    .body("Invalid credentials");
         }
+
         User user = optionalUser.get();
+
         if (!passwordEncoder.matches(password, user.getPassword())) {
-            return "Invalid credentials";
+            return ResponseEntity
+                    .status(HttpStatus.UNAUTHORIZED)
+                    .body("Invalid credentials");
         }
-        return jwtUtil.generateToken(email);
+
+        // Generate JWT with role included
+        String token = jwtUtil.generateToken(user.getEmail(), user.getRole());
+
+        return ResponseEntity.ok(token);
     }
 }
