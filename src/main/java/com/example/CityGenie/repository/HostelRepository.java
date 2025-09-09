@@ -10,6 +10,6 @@ public interface HostelRepository extends JpaRepository<Hostel, Long> {
 
     List<Hostel> findByTypeAndAvailable(String type, boolean available);
 
-    List<Hostel> findByLocationContainingAndAvailable(String location, boolean avialable);
+    List<Hostel> findByLocationContainingAndAvailable(String location, boolean available);
 
 }

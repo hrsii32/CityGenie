@@ -15,11 +15,11 @@ public class JwtUtil {
 
     private static final String SECRET_KEY = "your-very-secret-key-your-very-secret-key";
 
-    // Generate token with role
+
     public String generateToken(String email, Role role) {
         return Jwts.builder()
                 .setSubject(email)
-                .claim("role", role.name()) // use enum name
+                .claim("role", role.name())
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 10)) // 10h expiry
                 .signWith(Keys.hmacShaKeyFor(SECRET_KEY.getBytes()), SignatureAlgorithm.HS256)

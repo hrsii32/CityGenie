@@ -1,7 +1,5 @@
 package com.example.CityGenie.service;
 
-import java.util.Optional;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -9,6 +7,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.example.CityGenie.config.JwtUtil;
+import com.example.CityGenie.dto.LoginRequest;
+import com.example.CityGenie.dto.LoginResponse;
+import com.example.CityGenie.dto.SignUpRequest;
+import com.example.CityGenie.dto.UserResponse;
 import com.example.CityGenie.entity.Role;
 import com.example.CityGenie.entity.User;
 import com.example.CityGenie.repository.UserRepository;
@@ -25,45 +27,49 @@ public class AuthService {
     @Autowired
     private JwtUtil jwtUtil;
 
-    // Signup
-    public ResponseEntity<String> signup(User user) {
-        if (userRepo.findByEmail(user.getEmail()).isPresent()) {
+    public ResponseEntity<UserResponse> signup(SignUpRequest request) {
+        if (userRepo.findByEmail(request.getEmail()).isPresent()) {
             return ResponseEntity
                     .status(HttpStatus.CONFLICT)
-                    .body("Email already exists. Please login instead.");
+                    .build();
         }
 
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        String encodedPassword = passwordEncoder.encode(request.getPassword());
 
-        // Default role: STUDENT if not provided
-        if (user.getRole() == null) {
-            user.setRole(Role.STUDENT);
+        if (request.getRole() == null) {
+            request.setRole(Role.STUDENT);
         }
+
+        User user = new User();
+        user.setName(request.getName());
+        user.setEmail(request.getEmail());
+        user.setPassword(encodedPassword);
+        user.setRole(request.getRole());
 
         userRepo.save(user);
-        return ResponseEntity.ok("User registered successfully with role: " + user.getRole());
+
+        UserResponse response = new UserResponse(
+                user.getId(),
+                user.getName(),
+                user.getEmail(),
+                user.getRole()
+        );
+
+        return ResponseEntity.ok(response);
     }
 
-    // Login
-    public ResponseEntity<String> login(String email, String password) {
-        Optional<User> optionalUser = userRepo.findByEmail(email);
-        if (optionalUser.isEmpty()) {
-            return ResponseEntity
-                    .status(HttpStatus.UNAUTHORIZED)
-                    .body("Invalid credentials");
+    public ResponseEntity<LoginResponse> login(LoginRequest request) {
+        User user = userRepo.findByEmail(request.getEmail())
+                .orElseThrow(() -> new RuntimeException("Invalid credentials"));
+
+        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+            throw new RuntimeException("Invalid credentials");
         }
 
-        User user = optionalUser.get();
-
-        if (!passwordEncoder.matches(password, user.getPassword())) {
-            return ResponseEntity
-                    .status(HttpStatus.UNAUTHORIZED)
-                    .body("Invalid credentials");
-        }
-
-        // Generate JWT with role included
         String token = jwtUtil.generateToken(user.getEmail(), user.getRole());
+        UserResponse userResponse = new UserResponse(user.getId(), user.getName(), user.getEmail(), user.getRole());
 
-        return ResponseEntity.ok(token);
+        LoginResponse response = new LoginResponse(token, userResponse);
+        return ResponseEntity.ok(response);
     }
 }

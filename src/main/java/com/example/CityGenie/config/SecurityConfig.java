@@ -24,24 +24,17 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http.csrf(csrf -> csrf.disable()) // disable CSRF for REST APIs
+        http.csrf(csrf -> csrf.disable()) 
                 .authorizeHttpRequests(auth -> auth
-                // Public endpoints: signup & login
                 .requestMatchers("/auth/**").permitAll()
-                // Public endpoints: list rooms, hostels, services
                 .requestMatchers("/rooms/all", "/hostels/all", "/services/all").permitAll()
-                // Owner-only endpoints
                 .requestMatchers("/rooms/add", "/hostels/add").hasRole("OWNER")
-                // Service Provider-only endpoints
                 .requestMatchers("/services/add").hasRole("SERVICE_PROVIDER")
-                // All other requests require authentication
                 .anyRequest().authenticated()
                 )
-                // Make JWT stateless (no sessions)
                 .sessionManagement(session -> session
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
-                // Handle unauthorized and access denied errors
                 .exceptionHandling(ex -> ex
                 .authenticationEntryPoint((request, response, authException)
                         -> response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized"))
@@ -49,7 +42,6 @@ public class SecurityConfig {
                         -> response.sendError(HttpServletResponse.SC_FORBIDDEN, "Forbidden"))
                 );
 
-        // Add JWT filter before Spring Security's authentication filter
         http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();

@@ -5,6 +5,6 @@ public enum Role {
     STUDENT,
     PROVIDER,
     OWNER,
-    SERVICE_PROVIDER,
+    SERVICE_PROVIDER
 
 }

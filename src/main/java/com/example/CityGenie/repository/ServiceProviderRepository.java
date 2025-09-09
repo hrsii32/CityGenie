@@ -6,9 +6,10 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.example.CityGenie.entity.ServiceProvider;
 
-public interface ServiceProviderRepository extends JpaRepository<ServiceProvider, Long>{ 
+public interface ServiceProviderRepository extends JpaRepository<ServiceProvider, Long> {
 
     List<ServiceProvider> findByTypeAndAvailable(String type, boolean available);
-    List<ServiceProvider> findBylocationContainingAndAvailable(String location, boolean available);
+
+    List<ServiceProvider> findByLocationContainingAndAvailable(String location, boolean available);
 
 }
