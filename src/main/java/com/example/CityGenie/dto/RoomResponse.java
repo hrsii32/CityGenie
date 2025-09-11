@@ -6,7 +6,7 @@ import lombok.Data;
 public class RoomResponse {
 
     private Long id;
-    private String title;
+    private String name;
     private String description;
     private String type;
     private String location;
@@ -15,11 +15,11 @@ public class RoomResponse {
     private String ownerName;
     private String ownerEmail;
 
-    public RoomResponse(Long id, String title, String description, String type, String location,
+    public RoomResponse(Long id, String name, String description, String type, String location,
             Double rent, boolean available, String ownerName, String ownerEmail) {
 
         this.id = id;
-        this.title = title;
+        this.name = name;
         this.description = description;
         this.type = type;
         this.location = location;

@@ -23,6 +23,8 @@ import com.example.CityGenie.entity.User;
 import com.example.CityGenie.repository.UserRepository;
 import com.example.CityGenie.service.HostelService;
 
+import jakarta.validation.Valid;
+
 @RestController
 @RequestMapping("/hostels")
 public class HostelController {
@@ -33,9 +35,9 @@ public class HostelController {
     @Autowired
     private UserRepository userRepo;
 
-    @PreAuthorize("hasRole('OWNER')")
+    @PreAuthorize("hasRole('PROVIDER, ADMIN')")
     @PostMapping("/add")
-    public ResponseEntity<HostelResponse> addHostel(@RequestBody HostelRequest request, Authentication auth) {
+    public ResponseEntity<HostelResponse> addHostel(@Valid @RequestBody HostelRequest request, Authentication auth) {
         String email = auth.getName();
         User owner = userRepo.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Owner not found"));

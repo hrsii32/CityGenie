@@ -24,12 +24,15 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http.csrf(csrf -> csrf.disable()) 
+        http.csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/auth/**").permitAll()
                 .requestMatchers("/rooms/all", "/hostels/all", "/services/all").permitAll()
-                .requestMatchers("/rooms/add", "/hostels/add").hasRole("OWNER")
-                .requestMatchers("/services/add").hasRole("SERVICE_PROVIDER")
+                .requestMatchers("/rooms/add", "/rooms/update/**", "/rooms/delete/**",
+                        "/hostels/add", "/hostels/update/**", "/hostels/delete/**",
+                        "/services/add", "/services/update/**", "/services/delete/**")
+                .hasAnyRole("PROVIDER", "ADMIN")
+                .requestMatchers("/admin/**").hasRole("ADMIN")
                 .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session

@@ -23,6 +23,8 @@ import com.example.CityGenie.entity.User;
 import com.example.CityGenie.repository.UserRepository;
 import com.example.CityGenie.service.RoomService;
 
+import jakarta.validation.Valid;
+
 @RestController
 @RequestMapping("/rooms")
 public class RoomController {
@@ -33,15 +35,15 @@ public class RoomController {
     @Autowired
     private UserRepository userRepo;
 
-    @PreAuthorize("hasRole('OWNER')")
+    @PreAuthorize("hasRole('PROVIDER, ADMIN')")
     @PostMapping("/add")
-    public ResponseEntity<RoomResponse> addRoom(@RequestBody RoomRequest request, Authentication auth) {
+    public ResponseEntity<RoomResponse> addRoom(@Valid @RequestBody RoomRequest request, Authentication auth) {
         String email = auth.getName(); // get logged-in user
         User owner = userRepo.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Owner not found"));
 
         Room room = new Room();
-        room.setTitle(request.getTitle());
+        room.setName(request.getName());
         room.setDescription(request.getDescription());
         room.setType(request.getType());
         room.setLocation(request.getLocation());
@@ -72,7 +74,7 @@ public class RoomController {
     @PutMapping("/update/{id}")
     public ResponseEntity<RoomResponse> updateRoom(@PathVariable Long id, @RequestBody RoomRequest request) {
         Room room = new Room();
-        room.setTitle(request.getTitle());
+        room.setName(request.getName());
         room.setDescription(request.getDescription());
         room.setType(request.getType());
         room.setLocation(request.getLocation());

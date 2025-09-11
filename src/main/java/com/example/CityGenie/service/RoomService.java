@@ -46,7 +46,7 @@ public class RoomService {
         Room room = roomRepo.findById(id)
                 .orElseThrow(() -> new RuntimeException("Room Not Found"));
 
-        room.setTitle(roomDetails.getTitle());
+        room.setName(roomDetails.getName());
         room.setDescription(roomDetails.getDescription());
         room.setType(roomDetails.getType());
         room.setLocation(roomDetails.getLocation());
@@ -66,7 +66,7 @@ public class RoomService {
     private RoomResponse mapToResponse(Room room) {
         return new RoomResponse(
                 room.getId(),
-                room.getTitle(),
+                room.getName(),
                 room.getDescription(),
                 room.getType(),
                 room.getLocation(),

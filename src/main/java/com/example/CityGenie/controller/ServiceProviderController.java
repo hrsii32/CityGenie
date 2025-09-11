@@ -19,16 +19,18 @@ import com.example.CityGenie.dto.ServiceProviderResponse;
 import com.example.CityGenie.entity.ServiceProvider;
 import com.example.CityGenie.service.ServiceProviderService;
 
+import jakarta.validation.Valid;
+
 @RestController
-@RequestMapping("/service_provider")
+@RequestMapping("/services") // changed from /service_provider
 public class ServiceProviderController {
 
     @Autowired
     private ServiceProviderService serviceProviderService;
 
-    @PreAuthorize("hasRole('PROVIDER')")
+    @PreAuthorize("hasRole('PROVIDER, ADMIN')")
     @PostMapping("/add")
-    public ServiceProviderResponse addService(@RequestBody ServiceProvider serviceProvider) {
+    public ServiceProviderResponse addService(@RequestBody @Valid ServiceProvider serviceProvider) {
         return serviceProviderService.addServiceProvider(serviceProvider);
     }
 
@@ -37,8 +39,8 @@ public class ServiceProviderController {
         return serviceProviderService.getAllServiceProviders();
     }
 
-    @GetMapping("get/{id}")
-    public ServiceProviderResponse getServiceProviderById(@PathVariable Long id) {
+    @GetMapping("/get/{id}")
+    public ServiceProviderResponse getServiceById(@PathVariable Long id) {
         return serviceProviderService.getServiceById(id);
     }
 
@@ -52,7 +54,7 @@ public class ServiceProviderController {
         return serviceProviderService.getByLocation(location);
     }
 
-    @PreAuthorize("hasRole('PROVIDER')")
+    @PreAuthorize("hasRole('PROVIDER, ADMIN')")
     @PutMapping("/update/{id}")
     public ResponseEntity<ServiceProviderResponse> updateService(
             @PathVariable Long id,
@@ -60,7 +62,7 @@ public class ServiceProviderController {
         return ResponseEntity.ok(serviceProviderService.updateProvider(id, service));
     }
 
-    @PreAuthorize("hasRole('PROVIDER')")
+    @PreAuthorize("hasRole('PROVIDER, ADMIN')")
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<String> deleteService(@PathVariable Long id) {
         serviceProviderService.deleteServiceProvider(id);

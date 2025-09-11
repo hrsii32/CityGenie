@@ -8,15 +8,15 @@ import lombok.Data;
 @Data
 public class RoomRequest {
 
-    @NotBlank(message = "Title is Required")
-    private String title;
+    @NotBlank(message = "Name is Required")
+    private String name;
 
     private String description;
 
     @NotBlank
     private String type;
 
-    @NotBlank(message = "Locaiton Is Required")
+    @NotBlank(message = "Location is required")
     private String location;
 
     @NotNull(message = "Rent is reuired")

@@ -37,7 +37,7 @@ public class AuthService {
         String encodedPassword = passwordEncoder.encode(request.getPassword());
 
         if (request.getRole() == null) {
-            request.setRole(Role.STUDENT);
+            request.setRole(Role.CUSTOMER);
         }
 
         User user = new User();

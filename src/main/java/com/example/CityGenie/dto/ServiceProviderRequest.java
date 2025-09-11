@@ -9,7 +9,7 @@ public class ServiceProviderRequest {
     @NotBlank(message = "Name is Required")
     private String name;
 
-    @NotBlank(message = "Type is Reuired")
+    @NotBlank(message = "Type is required")
     private String type;
 
     @NotBlank(message = "location is Required")

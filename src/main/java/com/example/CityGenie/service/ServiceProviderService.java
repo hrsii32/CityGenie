@@ -79,8 +79,4 @@ public class ServiceProviderService {
         );
     }
 
-    public ServiceProviderResponse getById(Long id) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getById'");
-    }
 }

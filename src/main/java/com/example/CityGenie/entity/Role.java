@@ -2,9 +2,8 @@ package com.example.CityGenie.entity;
 
 public enum Role {
 
-    STUDENT,
+    CUSTOMER,
     PROVIDER,
-    OWNER,
-    SERVICE_PROVIDER
+    ADMIN
 
 }
