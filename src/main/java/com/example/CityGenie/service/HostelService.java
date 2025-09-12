@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import com.example.CityGenie.dto.HostelResponse;
 import com.example.CityGenie.entity.Hostel;
+import com.example.CityGenie.exception.ResourceNotFoundException;
 import com.example.CityGenie.repository.HostelRepository;
 
 @Service
@@ -26,6 +27,12 @@ public class HostelService {
                 .stream()
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
+    }
+
+    public HostelResponse getHostelById(Long id) {
+        Hostel hostel = hostelRepo.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Hostel not found with id: " + id));
+        return mapToResponse(hostel);
     }
 
     public List<HostelResponse> getHostelByType(String type) {

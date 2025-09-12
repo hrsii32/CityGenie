@@ -59,6 +59,12 @@ public class HostelController {
         return ResponseEntity.ok(hostelService.getAllHostels());
     }
 
+    @GetMapping("/get/{id}")
+    public ResponseEntity<HostelResponse> getHostelById(@PathVariable Long id) {
+        HostelResponse hostel = hostelService.getHostelById(id);
+        return ResponseEntity.ok(hostel);
+    }
+
     @GetMapping("/type/{type}")
     public ResponseEntity<List<HostelResponse>> getHostelByType(@PathVariable String type) {
         return ResponseEntity.ok(hostelService.getHostelByType(type));

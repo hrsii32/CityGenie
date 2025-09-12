@@ -30,7 +30,7 @@ public class ServiceProviderService {
 
     public ServiceProviderResponse getServiceById(Long id) {
         ServiceProvider provider = serviceProviderRepo.findById(id)
-                .orElseThrow(() -> new RuntimeException("Service Provider Not Found"));
+                .orElseThrow(() -> new RuntimeException("Service Provider Not Found" + id));
         return mapToResponse(provider);
     }
 
