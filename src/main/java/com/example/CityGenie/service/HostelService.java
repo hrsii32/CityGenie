@@ -51,7 +51,7 @@ public class HostelService {
 
     public HostelResponse updateHostel(Long id, Hostel updatedHostel) {
         Hostel hostel = hostelRepo.findById(id)
-                .orElseThrow(() -> new RuntimeException("Hostel Not Found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Hostel Not Found" + id));
 
         hostel.setName(updatedHostel.getName());
         hostel.setLocation(updatedHostel.getLocation());
@@ -64,8 +64,15 @@ public class HostelService {
 
     public void deleteHostel(Long id) {
         Hostel hostel = hostelRepo.findById(id)
-                .orElseThrow(() -> new RuntimeException("Hostel Not Found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Hostel Not Found"));
         hostelRepo.delete(hostel);
+    }
+
+    public void updateImageUrl(Long hostelId, String imageUrl) {
+        Hostel hostel = hostelRepo.findById(hostelId)
+                .orElseThrow(() -> new ResourceNotFoundException("Hostel not found"));
+        hostel.setImageUrl(imageUrl);
+        hostelRepo.save(hostel);
     }
 
     private HostelResponse mapToResponse(Hostel hostel) {

@@ -51,7 +51,7 @@ public class RoomService {
 
     public RoomResponse updateRoom(Long id, Room roomDetails) {
         Room room = roomRepo.findById(id)
-                .orElseThrow(() -> new RuntimeException("Room Not Found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Room Not Found"));
 
         room.setName(roomDetails.getName());
         room.setDescription(roomDetails.getDescription());
@@ -66,8 +66,16 @@ public class RoomService {
 
     public void deleteRoom(Long id) {
         Room room = roomRepo.findById(id)
-                .orElseThrow(() -> new RuntimeException("Room Not Found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Room Not Found"));
         roomRepo.delete(room);
+    }
+
+    public void updateImageUrl(Long roomId, String imageUrl) {
+        Room room = roomRepo.findById(roomId)
+                .orElseThrow(() -> new ResourceNotFoundException("Room not found with id: " + roomId));
+
+        room.setImageUrl(imageUrl);
+        roomRepo.save(room);
     }
 
     private RoomResponse mapToResponse(Room room) {

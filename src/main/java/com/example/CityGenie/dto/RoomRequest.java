@@ -19,7 +19,7 @@ public class RoomRequest {
     @NotBlank(message = "Location is required")
     private String location;
 
-    @NotNull(message = "Rent is reuired")
+    @NotNull(message = "Rent is required")
     @Positive(message = "Rent Must Be positive")
     private Double rent;
 

@@ -21,6 +21,7 @@ public class ServiceProvider {
     private String name;
     private String type;
     private String location;
+    private String imageUrl;
     private boolean available = true;
 
     @ManyToOne

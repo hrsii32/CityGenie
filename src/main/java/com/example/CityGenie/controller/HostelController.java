@@ -1,8 +1,10 @@
 package com.example.CityGenie.controller;
 
+import java.io.IOException;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -15,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.example.CityGenie.dto.HostelRequest;
 import com.example.CityGenie.dto.HostelResponse;
@@ -22,6 +25,7 @@ import com.example.CityGenie.entity.Hostel;
 import com.example.CityGenie.entity.User;
 import com.example.CityGenie.repository.UserRepository;
 import com.example.CityGenie.service.HostelService;
+import com.example.CityGenie.service.StorageService;
 
 import jakarta.validation.Valid;
 
@@ -35,7 +39,10 @@ public class HostelController {
     @Autowired
     private UserRepository userRepo;
 
-    @PreAuthorize("hasRole('PROVIDER, ADMIN')")
+    @Autowired
+    private StorageService storageService;
+
+    @PreAuthorize("hasAnyRole('PROVIDER, ADMIN')")
     @PostMapping("/add")
     public ResponseEntity<HostelResponse> addHostel(@Valid @RequestBody HostelRequest request, Authentication auth) {
         String email = auth.getName();
@@ -75,7 +82,7 @@ public class HostelController {
         return ResponseEntity.ok(hostelService.getHostelByLocation(location));
     }
 
-    @PreAuthorize("hasRole('OWNER')")
+    @PreAuthorize("hasAnyRole('PROVIDER, ADMIN')")
     @PutMapping("/update/{id}")
     public ResponseEntity<HostelResponse> updateHostel(@PathVariable Long id, @RequestBody HostelRequest request) {
         Hostel hostel = new Hostel();
@@ -89,10 +96,30 @@ public class HostelController {
         return ResponseEntity.ok(response);
     }
 
-    @PreAuthorize("hasRole('OWNER')")
+    @PreAuthorize("hasAnyRole('PROVIDER, ADMIN')")
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<String> deleteHostel(@PathVariable Long id) {
         hostelService.deleteHostel(id);
         return ResponseEntity.ok("Hostel deleted successfully");
     }
+
+    @PostMapping("/{id}/upload")
+    public ResponseEntity<String> uploadImage(
+            @PathVariable Long id,
+            @RequestParam("file") MultipartFile file) {
+
+        try {
+
+            String imageUrl = storageService.store(file);
+
+            hostelService.updateImageUrl(id, imageUrl);
+
+            return ResponseEntity.ok("Image uploaded successfully: " + imageUrl);
+
+        } catch (IOException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Upload failed: " + e.getMessage());
+        }
+    }
+
 }

@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import com.example.CityGenie.dto.ServiceProviderResponse;
 import com.example.CityGenie.entity.ServiceProvider;
+import com.example.CityGenie.exception.ResourceNotFoundException;
 import com.example.CityGenie.repository.ServiceProviderRepository;
 
 @Service
@@ -30,7 +31,7 @@ public class ServiceProviderService {
 
     public ServiceProviderResponse getServiceById(Long id) {
         ServiceProvider provider = serviceProviderRepo.findById(id)
-                .orElseThrow(() -> new RuntimeException("Service Provider Not Found" + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Service Provider Not Found" + id));
         return mapToResponse(provider);
     }
 
@@ -50,7 +51,7 @@ public class ServiceProviderService {
 
     public ServiceProviderResponse updateProvider(Long id, ServiceProvider updateProvider) {
         ServiceProvider provider = serviceProviderRepo.findById(id)
-                .orElseThrow(() -> new RuntimeException("Service Provider Not Found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Service Provider Not Found"));
 
         provider.setName(updateProvider.getName());
         provider.setType(updateProvider.getType());
@@ -63,8 +64,15 @@ public class ServiceProviderService {
 
     public void deleteServiceProvider(Long id) {
         ServiceProvider provider = serviceProviderRepo.findById(id)
-                .orElseThrow(() -> new RuntimeException("Service Provider Not Found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Service Provider Not Found"));
         serviceProviderRepo.delete(provider);
+    }
+
+    public void updateImageUrl(Long serviceId, String imageUrl) {
+        ServiceProvider service = serviceProviderRepo.findById(serviceId)
+                .orElseThrow(() -> new ResourceNotFoundException("ServiceProvider not found with id: " + serviceId));
+        service.setImageUrl(imageUrl);
+        serviceProviderRepo.save(service);
     }
 
     private ServiceProviderResponse mapToResponse(ServiceProvider provider) {
